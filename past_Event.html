@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Past Events - MindHive Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="main_Dashboard.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- NAVIGATION BAR -->
+  <div class="top-nav">
+    <div class="logo">
+      <a href="main_Dashboard.html" class="logo-link"></a>
+      <span class="mind">Mind</span><span class="hive">Hive</span>
+    </div>
+    <div class="nav-links">
+      <a href="main_Dashboard.html">Main Page</a>
+      <a href="past_Event.html" class="active-link">Past Events</a>
+      <a href="team_Member.html">Team Members</a>
+      <a href="help.html">Help</a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <!-- CHART & INFO SECTION -->
+    <div class="admin-section">
+      <div class="chart-container">
+        <div class="chart-and-info">
+          <!-- Chart -->
+          <div class="chart-box">
+            <canvas id="mainBarChart"></canvas>
+          </div>
+
+          <!-- Side Info -->
+          <div class="side-info">
+            <div class="summary-box">
+              <h3 class="box-title">Financial Summary</h3>
+              <div class="summary-item"><strong>Overview:</strong> 2024 - Mid 2025</div>
+              <div class="summary-item"><strong>Total Profit:</strong> RM 644,000</div>
+              <div class="summary-item"><strong>Total Expense:</strong> RM 540,000</div>
+            </div>
+            <div class="highlight-box quarterly-summary">
+              <h3 class="box-title">Quarterly Highlights</h3>
+              <ul></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAST EVENTS SECTION -->
+    <div class="current-events">
+      <div class="events-header">
+        <h2>Past Events (Jan 2024 - Jun 2025)</h2>
+      </div>
+      <div class="event-list" id="eventCards"></div>
+    </div>
+  </div>
+
+  <script src="past_Event.js"></script>
+</body>
+</html>

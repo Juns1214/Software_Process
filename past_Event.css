@@ -297,6 +297,25 @@ body {
   color: #e74c3c;
 }
 
+/* === New Custom Tags for Past Events === */
+.tag.completed {
+  background-color: #e0f2f1;
+  color: #004d40;
+}
+.tag.over-budget {
+  background-color: #ffebee;
+  color: #c62828;
+}
+.tag.under-budget {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+.tag.on-budget {
+  background-color: #fff8e1;
+  color: #f9a825;
+}
+
+
 /* === Responsive Design === */
 @media (max-width: 768px) {
   .chart-and-info {
@@ -308,3 +327,4 @@ body {
     width: 100%;
   }
 }
+
