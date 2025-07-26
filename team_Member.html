@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Team Members | MindHive</title>
+  <link rel="stylesheet" href="team_Member.css" />
+</head>
+<body>
+  <!-- Navigation -->
+  <div class="top-nav">
+    <div class="logo">
+      <a href="main_Dashboard.html" class="logo-link"></a>
+        <span class="mind">Mind</span><span class="hive">Hive</span>
+      </a>
+    </div>
+    <div class="nav-links">
+      <a href="main_Dashboard.html">Main Page</a>
+      <a href="past_Event.html">Past Events</a>
+      <a href="team_Member.html">Team Members</a>
+      <a href="help.html">Help</a>
+    </div>
+  </div>
+
+  <!-- Banner Image -->
+  <div class="banner">
+    <img src="res/team_member.png" alt="Team Member Banner" />
+  </div>
+
+  <!-- Team Section -->
+  <div class="team-container">
+    <h2 id="memberTypeTitle">Employee</h2>
+    <div class="type-switch">
+      <button onclick="showTeam('employee')" class="switch-btn">Employee</button>
+      <button onclick="showTeam('admin')" class="switch-btn">Admin</button>
+    </div>
+    <button class="add-btn" onclick="openAddModal()">+ Add Member</button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Employee No.</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Position</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="teamBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Add Member Modal -->
+  <div id="addModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeAddModal()">&times;</span>
+      <h3>Add New Member</h3>
+      <input type="text" id="newId" placeholder="Employee No." required />
+      <input type="text" id="newName" placeholder="Name" required />
+      <input type="email" id="newEmail" placeholder="Email" required />
+      <input type="text" id="newPhone" placeholder="Phone" required />
+      <input type="text" id="newPosition" placeholder="Position" required />
+      <button onclick="addMember()">Add Member</button>
+    </div>
+  </div>
+
+  <script src="team_Member.js"></script>
+</body>
+</html>

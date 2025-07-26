@@ -1,0 +1,224 @@
+/* General Reset */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f7f9fc;
+}
+
+/* === NAVIGATION BAR === */
+.top-nav {
+  position: sticky;
+  top: 0;
+  background-color: #ffffff; /* Light background */
+  color: #2c3e50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  width: 100%;
+  z-index: 1000;
+  box-sizing: border-box;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* subtle shadow */
+}
+
+.top-nav .logo {
+  font-size: 1.6em;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.top-nav .logo .mind {
+  color: #212121; /* Black or dark gray */
+}
+
+.top-nav .logo .hive {
+  color: #FFC107; /* Honey yellow */
+}
+
+/* Nav Links */
+.top-nav .nav-links {
+  display: flex;
+  gap: 25px;
+}
+
+.top-nav .nav-links a {
+  color: #37474F; /* Soft dark tone */
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 15px;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.top-nav .nav-links a:hover {
+  color: #6C63FF; /* Highlight accent */
+}
+
+/* Optional: Underline on hover */
+.top-nav .nav-links a::after {
+  content: "";
+  display: block;
+  height: 2px;
+  background-color: #6C63FF;
+  width: 0%;
+  transition: width 0.3s;
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+}
+
+.top-nav .nav-links a:hover::after {
+  width: 100%;
+}
+
+/* Banner */
+.banner img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: auto;
+}
+
+/* Team Section */
+.team-container {
+  max-width: 1000px;
+  margin: 30px auto;
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.team-container h2 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+.type-switch {
+  margin: 10px 0 20px;
+}
+
+.switch-btn {
+  background-color: #eceff1;
+  border: none;
+  padding: 8px 20px;
+  margin-right: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.switch-btn:hover {
+  background-color: #cfd8dc;
+}
+
+.add-btn {
+  float: right;
+  background-color: #6c63ff;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.add-btn:hover {
+  background-color: #574fcf;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+th {
+  background-color: #f5f5f5;
+}
+
+.action-btn {
+  margin-right: 5px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-btn {
+  background-color: #42a5f5;
+  color: white;
+}
+
+.delete-btn {
+  background-color: #ef5350;
+  color: white;
+}
+
+.edit-btn:hover {
+  background-color: #1e88e5;
+}
+
+.delete-btn:hover {
+  background-color: #e53935;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: white;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.modal-content h3 {
+  margin-top: 0;
+}
+
+.modal-content input {
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.modal-content button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background-color: #6c63ff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.close {
+  float: right;
+  font-size: 22px;
+  cursor: pointer;
+}

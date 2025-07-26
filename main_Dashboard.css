@@ -22,12 +22,19 @@ body {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* subtle shadow */
 }
 
-/* Logo: You can swap this with an <img> if needed */
 .top-nav .logo {
   font-size: 1.6em;
   font-weight: 700;
-  color: #37474F; /* Blue-gray */
   letter-spacing: 0.5px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.top-nav .logo .mind {
+  color: #212121; /* Black or dark gray */
+}
+
+.top-nav .logo .hive {
+  color: #FFC107; /* Honey yellow */
 }
 
 /* Nav Links */
