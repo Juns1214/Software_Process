@@ -1,64 +1,77 @@
+/* === Body and Background remain unchanged === */
 body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: Arial, sans-serif;
-
-  /* Background */
-  background-color: #f2f4f8; /* fallback color */
+  font-family: 'Inter', sans-serif;
+  background-color: #f2f4f8;
   background-image: url('res/Login_BG.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* === LOGIN PAGE === */
-.login-container {
-  background-color: white;
-  padding: 40px 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 360px;
-  margin: 80px auto;
+/* === Updated Overlay === */
+.overlay {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 50px 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 650px; /* wider */
   text-align: center;
 }
 
-.login-container h1 {
-  margin-bottom: 10px;
-  font-size: 2em;
+/* === Larger Logo === */
+.logo {
+  height: 140px; /* increased from 60px */
+}
+
+/* === Font and Input Adjustments for Wider Layout === */
+h2 {
+  font-size: 26px;
   color: #2c3e50;
+  margin-bottom: 10px;
 }
 
-.login-container p {
-  font-size: 14px;
+p {
+  font-size: 15px;
   color: #555;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
-.login-container input {
+input {
   width: 100%;
-  margin: 10px 0;
-  padding: 12px;
-  border-radius: 6px;
+  padding: 14px;
+  margin-bottom: 14px;
+  border-radius: 8px;
   border: 1px solid #ccc;
-  font-size: 1em;
-  box-sizing: border-box;
+  font-size: 16px;
+  transition: 0.2s;
 }
 
-.login-container button {
+input:focus {
+  outline: none;
+  border-color: #6c63ff;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+}
+
+button {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   background-color: #6C63FF;
   color: white;
-  font-weight: bold;
-  font-size: 1em;
+  font-weight: 600;
+  font-size: 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 8px;
+  transition: background-color 0.3s ease;
 }
 
-.login-container button:hover {
+button:hover {
   background-color: #574fcf;
 }
 
