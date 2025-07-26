@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MindHive Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="main_Dashboard.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- NAVIGATION BAR -->
+  <div class="top-nav">
+    <div class="logo">MindHive</div>
+    <div class="nav-links" id="navLinks">
+      <a href="#">Main Page</a>
+      <a href="#" id="pastEventLink">Past Events</a>
+      <a href="#" id="teamLink">Team Members</a>
+      <a href="#">Help</a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <!-- ADMIN-ONLY SECTION -->
+    <div class="admin-section" id="adminSection" style="display: none;">
+      <div class="chart-container">
+        <div class="chart-and-info">
+          <!-- Chart -->
+          <div class="chart-box">
+            <canvas id="profitExpenseChart"></canvas>
+          </div>
+
+          <!-- Financial + Quarterly Info -->
+          <div class="side-info">
+            <!-- Financial Summary -->
+            <div class="summary-box">
+              <h3 class="box-title">Financial Summary</h3>
+              <div class="summary-item"><strong>Overview:</strong> Year 2025</div>
+              <div class="summary-item"><strong>Total Profit:</strong> RM 333,000</div>
+              <div class="summary-item"><strong>Total Expense:</strong> RM 257,000</div>
+            </div>
+
+            <!-- Quarterly Highlights -->
+            <div class="highlight-box">
+              <h3 class="box-title">Quarterly Highlights</h3>
+              <ul>
+                <li>Q1: Successful product launch</li>
+                <li>Q2: Expanded team by 20%</li>
+                <li>Q3: Opened new branch in Penang</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS Logic -->
+  <script src="main_Dashboard.js"></script>
+</body>
+</html>

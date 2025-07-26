@@ -1,0 +1,125 @@
+/* === NAVIGATION BAR === */
+.top-nav {
+  position: sticky;
+  top: 0;
+  background-color: #2c3e50;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  width: 100%;
+  z-index: 1000;
+  box-sizing: border-box;
+}
+
+.top-nav .logo {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.top-nav .nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.top-nav .nav-links a {
+  color: white;
+  text-decoration: none;
+}
+
+/* === MAIN CONTENT === */
+.main-content {
+  padding: 40px 30px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* === ADMIN SECTION === */
+.admin-section {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* === CHART CONTAINER with embedded chart + info === */
+.chart-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Flex layout to hold chart and info boxes */
+.chart-and-info {
+  display: flex;
+  gap: 30px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+/* Chart box on the left */
+.chart-box {
+  flex: 2;
+  min-width: 300px;
+}
+
+/* Side info (summary + highlights) on the right */
+.side-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 260px;
+  gap: 20px;
+}
+
+/* === INFO BOXES === */
+.summary-box,
+.highlight-box {
+  background-color: #fff;
+  padding: 20px;
+  border-left: 5px solid #6C63FF;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.summary-box h3,
+.highlight-box h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #6c63ff; /* Matching color for both */
+}
+
+/* Shared text styles */
+.summary-item,
+.highlight-box ul {
+  font-size: 14px;
+  color: #333;
+}
+
+.summary-item {
+  margin-bottom: 10px;
+}
+
+.highlight-box ul {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.highlight-box li {
+  margin-bottom: 8px;
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+  .chart-and-info {
+    flex-direction: column;
+  }
+
+  .chart-box,
+  .side-info {
+    width: 100%;
+  }
+}

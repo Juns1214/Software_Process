@@ -16,16 +16,12 @@ function login() {
   );
 
   if (user) {
-    // Save role to localStorage
+    // Save user data to localStorage
     localStorage.setItem("userRole", user.role);
     localStorage.setItem("userEmail", user.email);
 
-    // Redirect based on role
-    if (user.role === "admin") {
-      window.location.href = "admin_Dashboard.html"; // (create later)
-    } else {
-      window.location.href = "employee_Dashboard.html"; // (create later)
-    }
+    // Redirect to unified dashboard
+    window.location.href = "main_Dashboard.html";
   } else {
     errorEl.textContent = "Invalid email or password";
   }
