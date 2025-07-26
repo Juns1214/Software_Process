@@ -5,6 +5,7 @@
   <title>MindHive Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="main_Dashboard.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -51,6 +52,47 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- CURRENT EVENTS SECTION -->
+    <div class="current-events">
+      <div class="events-header">
+        <h2>Current Events</h2>
+        <button id="addEventBtn" class="add-btn" style="display: none;">+ Add Event</button>
+      </div>
+
+      <div class="event-list">
+       
+      </div>
+    </div>
+
+    <!-- ADD EVENT MODAL -->
+    <div id="eventModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" id="closeModal">&times;</span>
+        <h2>Add New Event</h2>
+        <form id="eventForm">
+          <input type="text" id="eventName" placeholder="Event Name" required />
+          <input type="text" id="eventPIC" placeholder="Person in Charge" required />
+          <input type="date" id="eventDate" required />
+
+          <label>Stage:</label>
+          <select id="eventStage">
+            <option value="planning">Planning</option>
+            <option value="execution">Execution</option>
+            <option value="review">Review</option>
+          </select>
+
+          <label>Budget:</label>
+          <select id="eventBudget">
+            <option value="pending">Pending</option>
+            <option value="review">Under Review</option>
+            <option value="approved">Approved</option>
+          </select>
+
+          <button type="submit">Add Event</button>
+        </form>
       </div>
     </div>
   </div>

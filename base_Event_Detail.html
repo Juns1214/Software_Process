@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Event Detail</title>
+</head>
+<body>
+  <h1 id="eventTitle">Loading...</h1>
+  <p><strong>PIC:</strong> <span id="eventPIC"></span></p>
+  <p><strong>Date:</strong> <span id="eventDate"></span></p>
+  <p><strong>Stage:</strong> <span id="eventStage"></span></p>
+  <p><strong>Budget:</strong> <span id="eventBudget"></span></p>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventId = urlParams.get("id");
+
+    const events = JSON.parse(localStorage.getItem("events") || "[]");
+    const event = events.find(e => e.id == eventId);
+
+    if (event) {
+      document.getElementById("eventTitle").textContent = event.name;
+      document.getElementById("eventPIC").textContent = event.pic;
+      document.getElementById("eventDate").textContent = event.date;
+      document.getElementById("eventStage").textContent = event.stage;
+      document.getElementById("eventBudget").textContent = event.budget;
+    } else {
+      document.body.innerHTML = "<p>Event not found.</p>";
+    }
+  </script>
+</body>
+</html>
