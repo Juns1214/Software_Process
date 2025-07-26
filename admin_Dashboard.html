@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <h1>MindHive</h1>
+    <button onclick="logout()">Logout</button>
+  </header>
+
+  <main>
+    <!-- Charts Section -->
+    <section id="charts">
+      <canvas id="pieChart" width="200"></canvas>
+      <canvas id="barChart" width="400"></canvas>
+    </section>
+
+    <!-- Create Button (Admin only) -->
+    <button onclick="createEvent()" class="create-btn">+ Create Event</button>
+
+    <!-- Current Events Section -->
+    <section id="eventList">
+      <h2>Current Events</h2>
+      <div id="eventsContainer"></div>
+    </section>
+  </main>
+
+  <script src="admin_Dashboard.html"></script>
+</body>
+</html>
