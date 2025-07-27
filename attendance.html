@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Attendance | MindHive</title>
+  <link rel="stylesheet" href="attendance.css" />
+</head>
+<body>
+  <!-- Navigation -->
+  <div class="top-nav">
+    <div class="logo">
+      <a href="main_Dashboard.html" class="logo-link">
+        <span class="mind">Mind</span><span class="hive">Hive</span>
+      </a>
+    </div>
+    <div class="nav-links">
+      <a href="main_Dashboard.html">Main Page</a>
+      <a href="past_Event.html">Past Events</a>
+      <a href="team_Member.html">Team Members</a>
+      <a href="help.html">Help</a>
+    </div>
+  </div>
+
+  <div class="banner">
+    <img src="res/team_member.png" alt="Team & Participant Banner" />
+  </div>
+
+  <div class="team-container">
+    <h2>Team Member and Participant Attendance</h2>
+    <div class="toggle-buttons">
+      <button id="teamBtn" class="switch-btn active" onclick="switchView('team')">Team Members</button>
+      <button id="participantBtn" class="switch-btn" onclick="switchView('participant')">Participants</button>
+    </div>
+
+    <div class="table-container" id="teamMemberTable">
+      <div class="table-header">
+        <h3>Team Members</h3>
+        <button id="addTeamBtn" class="add-btn" onclick="openAddModal('team')">+ Add Member</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Task Involved</th>
+            <th>Attendance</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="teamMemberBody"></tbody>
+      </table>
+    </div>
+
+    <div class="table-container" id="participantTable" style="display: none;">
+      <div class="table-header">
+        <h3>Participants</h3>
+        <button id="addParticipantBtn" class="add-btn" onclick="openAddModal('participant')">+ Add Participant</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>H/P No.</th>
+            <th>Attendance</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="participantBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="addModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3 id="modalTitle">Add Team Member</h3>
+      <form id="addForm">
+        <div id="teamFields">
+          <input type="text" id="teamName" placeholder="Name" />
+          <input type="text" id="teamRole" placeholder="Role" />
+          <input type="text" id="teamTask" placeholder="Task Involved" />
+        </div>
+        <div id="participantFields" style="display: none;">
+          <input type="text" id="participantName" placeholder="Name" />
+          <input type="email" id="participantEmail" placeholder="Email" />
+          <input type="text" id="participantPhone" placeholder="H/P No." />
+        </div>
+        <button type="submit" class="add-submit-btn">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="attendance.js"></script>
+</body>
+</html>

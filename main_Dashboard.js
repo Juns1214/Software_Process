@@ -1,274 +1,210 @@
-let currentType = 'team'; // 'team' or 'participant'
-let teamData = [];
-let participantData = [];
-let editingIndex = -1;
+document.addEventListener("DOMContentLoaded", () => {
+  const role = localStorage.getItem("userRole") || "employee";
+  const modal = document.getElementById("eventModal");
+  const addBtn = document.getElementById("addEventBtn");
+  const closeBtn = document.getElementById("closeModal");
+  const form = document.getElementById("eventForm");
+  const eventList = document.querySelector(".event-list");
 
-// Get role from localStorage (using same pattern as your other files)
+  // Hide sections for employee
+  if (role === "employee") {
+    document.getElementById("pastEventLink").style.display = "none";
+    document.getElementById("teamLink").style.display = "none";
+    document.getElementById("addEventBtn").style.display = "none";
+  }
+
+  // Admin-only logic
+  if (role === "admin") {
+    document.getElementById("adminSection").style.display = "flex";
+    document.getElementById("addEventBtn").style.display = "inline-block";
+
+    const ctx = document.getElementById("profitExpenseChart")?.getContext("2d");
+    if (ctx) {
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ["Q1", "Q2", "Q3"],
+          datasets: [
+            {
+              label: "Profit (RM)",
+              data: [120000, 135000, 78000],
+              backgroundColor: "rgba(54, 162, 235, 0.7)"
+            },
+            {
+              label: "Expense (RM)",
+              data: [90000, 100000, 67000],
+              backgroundColor: "rgba(255, 99, 132, 0.7)"
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: "Company Financial Overview (2025)",
+              font: { size: 18 }
+            },
+            legend: { position: 'top' }
+          },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+
+    // Show modal
+    addBtn.onclick = () => modal.style.display = "block";
+    closeBtn.onclick = () => modal.style.display = "none";
+    window.onclick = (e) => {
+      if (e.target === modal) modal.style.display = "none";
+    };
+
+    // Handle form submit
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("eventName").value;
+      const picInput = document.getElementById("eventPIC").value;
+      const picArray = picInput
+        .split(",")
+        .map(p => p.trim())
+        .filter(Boolean);
+
+      const date = document.getElementById("eventDate").value;
+      const stage = document.getElementById("eventStage").value;
+      const budget = document.getElementById("eventBudget").value;
+      const eventId = Date.now(); // Unique ID
+
+      const newEvent = {
+        id: eventId,
+        name,
+        pics: picArray, // ✅ use 'pics' for compatibility
+        date,
+        stage,
+        budget
+      };
+
+      const events = JSON.parse(localStorage.getItem("events") || "[]");
+      events.push(newEvent);
+      localStorage.setItem("events", JSON.stringify(events));
+
+      renderEvents();
+      form.reset();
+      modal.style.display = "none";
+    });
+  }
+
+  function renderEvents() {
+    eventList.innerHTML = "";
+    const events = JSON.parse(localStorage.getItem("events") || "[]");
+
+    events.forEach(event => {
+      const stageClass = event.stage;
+      const budgetClass = event.budget;
+
+      // ✅ Handle both new and old data structures
+      let picList = "N/A";
+      if (Array.isArray(event.pics)) {
+        picList = event.pics.join(", ");
+      } else if (typeof event.pic === "string") {
+        picList = event.pic;
+      }
+
+    const cardHTML = `
+        <div class="event-card" data-id="${event.id}">
+            ${role === "admin" ? `<i class="fas fa-trash trash-icon" title="Delete Event"></i>` : ""}
+            <h3><a href="base_Event_Detail.html?id=${event.id}" target="_blank">${event.name}</a></h3>
+            <p><strong>PIC:</strong> ${picList}</p>
+            <p><strong>Date:</strong> ${event.date}</p>
+            <p><strong>Stage:</strong> <span class="tag ${stageClass}">${capitalize(event.stage)}</span></p>
+            <p><strong>Budget:</strong> <span class="tag ${budgetClass}">${capitalize(event.budget)}</span></p>
+            <div class="event-links">
+            </div>
+        </div>`;
+
+      eventList.insertAdjacentHTML("beforeend", cardHTML);
+    });
+
+    // Admin delete
+    if (role === "admin") {
+      document.querySelectorAll(".trash-icon").forEach(icon => {
+        icon.addEventListener("click", (e) => {
+          const card = e.target.closest(".event-card");
+          const id = parseInt(card.dataset.id);
+          const confirmed = confirm("Are you sure you want to delete this event?");
+          if (confirmed) {
+            let events = JSON.parse(localStorage.getItem("events") || "[]");
+            events = events.filter(event => event.id !== id);
+            localStorage.setItem("events", JSON.stringify(events));
+            renderEvents();
+          }
+        });
+      });
+    }
+  }
+
+  function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  renderEvents();
+});
+
+// Get event ID from URL
+const urlParams = new URLSearchParams(window.location.search);
+const eventId = urlParams.get("id");
+
+let events = JSON.parse(localStorage.getItem("events") || "[]");
+let event = events.find(e => e.id == eventId);
+
+// Get user role
 const role = localStorage.getItem("userRole") || "employee";
-const isAdmin = role === "admin";
 
-function switchType(type) {
-  currentType = type;
-  
-  // Update button text based on type
-  const addBtn = document.getElementById("addBtn");
-  if (type === 'team') {
-    addBtn.textContent = "+ Add Member";
-    addBtn.style.display = isAdmin ? "inline-block" : "none";
-  } else {
-    addBtn.textContent = "+ Add Participant";
-    addBtn.style.display = isAdmin ? "inline-block" : "none"; // Admin control for participants too
-  }
-  
-  // Update modal title
-  document.getElementById("modalTitle").textContent = 
-    type === 'team' ? "Add Team Member" : "Add Participant";
-    
-  renderTable();
+// DOM Elements
+const eventTitle = document.getElementById("eventTitle");
+const eventDescription = document.getElementById("eventDescription");
+const editBtn = document.getElementById("editEventBtn");
+const modal = document.getElementById("editModal");
+const milestoneList = document.getElementById("milestoneList");
+const budgetEditBtn = document.getElementById("editBudgetBtn");
+const budgetModal = document.getElementById("budgetModal");
+const milestoneModal = document.getElementById("milestoneModal");
+const addMilestoneBtn = document.getElementById("addMilestoneBtn");
+
+// Hide admin-only buttons from employees
+if (role !== "admin") {
+  editBtn.style.display = "none";
+  budgetEditBtn.style.display = "none";
+  addMilestoneBtn.style.display = "none";
 }
 
-function renderTable() {
-  const header = document.getElementById("tableHeader");
-  const body = document.getElementById("tableBody");
-  body.innerHTML = "";
-
-  if (currentType === 'team') {
-    header.innerHTML = `
-      <tr>
-        <th>No.</th>
-        <th>Name</th>
-        <th>Role</th>
-        <th>Task</th>
-        ${isAdmin ? '<th>Actions</th>' : ''}
-      </tr>`;
-      
-    teamData.forEach((member, i) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${i + 1}</td>
-        <td>${member.name}</td>
-        <td>${member.role}</td>
-        <td>${member.task}</td>
-        ${isAdmin ? `
-          <td>
-            <button class="action-btn edit-btn" onclick="editMember(${i})">Edit</button>
-            <button class="action-btn delete-btn" onclick="deleteMember(${i})">Delete</button>
-          </td>
-        ` : ''}`;
-      body.appendChild(row);
-    });
-  } else {
-    header.innerHTML = `
-      <tr>
-        <th>No.</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>H/P No.</th>
-        ${isAdmin ? '<th>Actions</th>' : ''}
-      </tr>`;
-      
-    participantData.forEach((p, i) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${i + 1}</td>
-        <td>${p.name}</td>
-        <td>${p.email}</td>
-        <td>${p.phone}</td>
-        ${isAdmin ? `
-          <td>
-            <button class="action-btn edit-btn" onclick="editParticipant(${i})">Edit</button>
-            <button class="action-btn delete-btn" onclick="deleteParticipant(${i})">Delete</button>
-          </td>
-        ` : ''}`;
-      body.appendChild(row);
-    });
-  }
-
-  // Show/hide appropriate form fields in modal
-  document.getElementById("teamFields").style.display = currentType === 'team' ? "block" : "none";
-  document.getElementById("participantFields").style.display = currentType === 'participant' ? "block" : "none";
-}
-
-function openAddModal() {
-  if (!isAdmin) {
-    alert("You don't have permission to add members or participants.");
-    return;
-  }
-  
-  editingIndex = -1;
-  clearModalFields();
-  
-  // Update modal title based on current type and action
-  document.getElementById("modalTitle").textContent = 
-    currentType === 'team' ? "Add Team Member" : "Add Participant";
-    
-  document.getElementById("modal").style.display = "block";
-}
-
-function closeModal() {
-  document.getElementById("modal").style.display = "none";
-  clearModalFields();
-}
-
-function saveMember() {
-  if (!isAdmin && editingIndex === -1) {
-    alert("You don't have permission to add new entries.");
+// Load event details
+function loadEventDetails() {
+  if (!event) {
+    document.body.innerHTML = "<p>Event not found.</p>";
     return;
   }
 
-  if (currentType === 'team') {
-    const name = document.getElementById("teamName").value.trim();
-    const role = document.getElementById("teamRole").value.trim();
-    const task = document.getElementById("teamTask").value.trim();
+  eventTitle.textContent = event.name || "Event Name";
+  eventDescription.textContent = event.description || "About event";
 
-    // Basic validation
-    if (!name || !role || !task) {
-      alert("Please fill in all fields for team member.");
-      return;
-    }
-
-    if (editingIndex >= 0) {
-      // Editing existing member
-      teamData[editingIndex] = { name, role, task };
-    } else {
-      // Adding new member
-      teamData.push({ name, role, task });
-    }
-  } else {
-    const name = document.getElementById("participantName").value.trim();
-    const email = document.getElementById("participantEmail").value.trim();
-    const phone = document.getElementById("participantPhone").value.trim();
-    
-    // Basic validation
-    if (!name || !email || !phone) {
-      alert("Please fill in all fields for participant.");
-      return;
-    }
-    
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      alert("Please enter a valid email address.");
-      return;
-    }
-
-    if (editingIndex >= 0) {
-      // Editing existing participant
-      participantData[editingIndex] = { name, email, phone };
-    } else {
-      // Adding new participant
-      participantData.push({ name, email, phone });
-    }
+  if (!event.pics && event.pic) {
+    event.pics = [event.pic];
   }
 
-  closeModal();
-  renderTable();
-}
+  document.getElementById("eventDate").textContent = event.date || "N/A";
 
-function editMember(index) {
-  if (!isAdmin) {
-    alert("You don't have permission to edit members.");
-    return;
+  if (!event.milestones) event.milestones = [];
+  if (!event.budgetData) {
+    event.budgetData = {
+      actualExpense: 0,
+      expectedExpense: 0,
+      actualIncome: 0,
+      expectedIncome: 0
+    };
   }
-  
-  editingIndex = index;
-  const member = teamData[index];
-  
-  // Populate form fields
-  document.getElementById("teamName").value = member.name;
-  document.getElementById("teamRole").value = member.role;
-  document.getElementById("teamTask").value = member.task;
-  
-  // Update modal title for editing
-  document.getElementById("modalTitle").textContent = "Edit Team Member";
-  
-  document.getElementById("modal").style.display = "block";
-}
 
-function editParticipant(index) {
-  if (!isAdmin) {
-    alert("You don't have permission to edit participants.");
-    return;
-  }
-  
-  editingIndex = index;
-  const participant = participantData[index];
-  
-  // Populate form fields
-  document.getElementById("participantName").value = participant.name;
-  document.getElementById("participantEmail").value = participant.email;
-  document.getElementById("participantPhone").value = participant.phone;
-  
-  // Update modal title for editing
-  document.getElementById("modalTitle").textContent = "Edit Participant";
-  
-  // Switch to participant view and show modal
-  currentType = 'participant';
-  document.getElementById("teamFields").style.display = "none";
-  document.getElementById("participantFields").style.display = "block";
-  
-  document.getElementById("modal").style.display = "block";
+  renderPICList();
+  renderMilestones();
+  renderBudgetProgress();
 }
-
-function deleteMember(index) {
-  if (!isAdmin) {
-    alert("You don't have permission to delete members.");
-    return;
-  }
-  
-  if (confirm("Are you sure you want to delete this team member?")) {
-    teamData.splice(index, 1);
-    renderTable();
-  }
-}
-
-function deleteParticipant(index) {
-  if (!isAdmin) {
-    alert("You don't have permission to delete participants.");
-    return;
-  }
-  
-  if (confirm("Are you sure you want to delete this participant?")) {
-    participantData.splice(index, 1);
-    renderTable();
-  }
-}
-
-function clearModalFields() {
-  // Clear all form fields
-  document.getElementById("teamName").value = "";
-  document.getElementById("teamRole").value = "";
-  document.getElementById("teamTask").value = "";
-  document.getElementById("participantName").value = "";
-  document.getElementById("participantEmail").value = "";
-  document.getElementById("participantPhone").value = "";
-}
-
-// Add some sample data for testing
-function loadSampleData() {
-  teamData = [
-    { name: "John Doe", role: "Project Manager", task: "Project Planning & Coordination" },
-    { name: "Jane Smith", role: "Developer", task: "Frontend Development" },
-    { name: "Mike Johnson", role: "Designer", task: "UI/UX Design" }
-  ];
-  
-  participantData = [
-    { name: "Alice Brown", email: "alice@example.com", phone: "012-345-6789" },
-    { name: "Bob Wilson", email: "bob@example.com", phone: "012-987-6543" },
-    { name: "Carol Davis", email: "carol@example.com", phone: "012-555-1234" }
-  ];
-}
-
-// Initialize on page load
-window.onload = function () {
-  // Load sample data for demonstration
-  loadSampleData();
-  
-  // Default to team view
-  switchType("team");
-  
-  // Console log for debugging
-  console.log("Page loaded");
-  console.log("Current role:", localStorage.getItem("userRole"));
-  console.log("Is Admin:", isAdmin);
-};
