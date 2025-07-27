@@ -2,31 +2,172 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Event Detail</title>
+  <link rel="stylesheet" href="base_Event_Detail.css" />
 </head>
 <body>
-  <h1 id="eventTitle">Loading...</h1>
-  <p><strong>PIC:</strong> <span id="eventPIC"></span></p>
-  <p><strong>Date:</strong> <span id="eventDate"></span></p>
-  <p><strong>Stage:</strong> <span id="eventStage"></span></p>
-  <p><strong>Budget:</strong> <span id="eventBudget"></span></p>
+  <!-- Navigation Bar (reused) -->
+  <div class="top-nav">
+    <div class="logo">
+      <a href="main_Dashboard.html" class="logo-link"></a>
+      <span class="mind">Mind</span><span class="hive">Hive</span>
+    </div>
+    <div class="nav-links" id="navLinks">
+      <a href="main_Dashboard.html">Main Page</a>
+      <a href="past_Event.html" id="pastEventLink">Past Events</a>
+      <a href="team_Member.html" id="teamLink">Team Members</a>
+      <a href="help.html">Help</a>
+    </div>
+  </div>
 
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const eventId = urlParams.get("id");
+  <!-- Event Section -->
+  <div class="event-section">
+    <div class="event-header">
+      <div class="event-title-desc">
+        <h1 id="eventTitle">Event Name</h1>
+        <p id="eventDescription">About event</p>
+      </div>
+      <button id="editEventBtn">Edit Event</button>
+    </div>
+  </div>
 
-    const events = JSON.parse(localStorage.getItem("events") || "[]");
-    const event = events.find(e => e.id == eventId);
+  <!-- Edit Modal -->
+  <div id="editModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Edit Event</h2>
+      <label>Event Name</label>
+      <input type="text" id="editName" />
+      <label>Description</label>
+      <textarea id="editDesc"></textarea>
+      <label>Event P.I.C (comma separated)</label>
+      <input type="text" id="editPICs" />
+      <label>Event Date</label>
+      <input type="date" id="editDate" />
+      <div class="modal-actions">
+        <button onclick="saveEventDetails()">Save</button>
+        <button onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
 
-    if (event) {
-      document.getElementById("eventTitle").textContent = event.name;
-      document.getElementById("eventPIC").textContent = event.pic;
-      document.getElementById("eventDate").textContent = event.date;
-      document.getElementById("eventStage").textContent = event.stage;
-      document.getElementById("eventBudget").textContent = event.budget;
-    } else {
-      document.body.innerHTML = "<p>Event not found.</p>";
-    }
-  </script>
+  <div class="pic-date-section">
+  <div class="left">
+    <h2 class="pic-title">Event PIC</h2>
+    <div id="picList" class="pic-list"></div>
+  </div>
+  <div class="right">
+    <div class="event-date-box">
+      <p><strong>Date:</strong> <span id="eventDate"></span></p>
+    </div>
+    <div class="action-buttons">
+      <a href="#" id="teamParticipantBtn">Team & Participants</a>
+      <a href="#" id="attendanceBtn">Attendance</a>
+    </div>
+  </div>
+  </div>
+
+  <hr class="section-divider">
+
+<div class="final-section">
+  <div class="milestone-section">
+    <h2>Milestone</h2>
+    <button id="addMilestoneBtn" class="milestone-btn">+ Add Milestone</button>
+    <ul id="milestoneList" class="milestone-list"></ul>
+  </div>
+
+  <div class="budget-section">
+    <h2>Budget</h2>
+
+    <div class="budget-progress">
+      <label>Target Expense</label>
+      <div class="budget-row">
+        <span id="actualExpenseLabel">Actual: RM0</span>
+        <span id="expectedExpenseLabel">Expected: RM0</span>
+      </div>
+      <progress id="expenseBar" max="100" value="0"></progress>
+    </div>
+
+    <div class="budget-progress">
+      <label>Target Income</label>
+      <div class="budget-row">
+        <span id="actualIncomeLabel">Actual: RM0</span>
+        <span id="expectedIncomeLabel">Expected: RM0</span>
+      </div>
+      <progress id="incomeBar" max="100" value="0"></progress>
+    </div>
+
+    <button id="editBudgetBtn" class="budget-btn">Edit Budget</button>
+  </div>
+</div>
+
+<!-- Milestone Modal -->
+<div id="milestoneModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeMilestoneModal">&times;</span>
+    <h3>Add Milestone</h3>
+    <input type="text" id="milestoneName" placeholder="Milestone name">
+    <input type="date" id="milestoneDate">
+    <button id="saveMilestoneBtn">Save</button>
+  </div>
+</div>
+
+<!-- Budget Modal -->
+<div id="budgetModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeBudgetModal">&times;</span>
+    <h3>Edit Budget</h3>
+    <input type="number" id="actualExpenseInput" placeholder="Actual Expense (RM)">
+    <input type="number" id="expectedExpenseInput" placeholder="Expected Expense (RM)">
+    <input type="number" id="actualIncomeInput" placeholder="Actual Income (RM)">
+    <input type="number" id="expectedIncomeInput" placeholder="Expected Income (RM)">
+    <button id="saveBudgetBtn">Save</button>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- TASK SECTION -->
+<div class="tasklist-section">
+  <div class="tasklist-header">
+    <h2>Task List</h2>
+    <button id="addTaskBtn" class="task-btn">+ Add Task</button>
+  </div>
+  <table class="task-table">
+    <thead>
+      <tr>
+        <th>Task No</th>
+        <th>Task Name</th>
+        <th>Assigned To</th>
+        <th>Deadline</th>
+        <th>Status</th>
+        <th class="admin-only">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="taskBody"></tbody>
+  </table>
+</div>
+
+<!-- Modal for Add/Edit Task -->
+<div id="taskModal" class="modal hidden">
+  <div class="modal-content">
+    <h3 id="taskModalTitle">Add Task</h3>
+    <input type="text" id="taskNameInput" placeholder="Task name">
+    <input type="text" id="taskAssignedInput" placeholder="Assigned to">
+    <input type="date" id="taskDeadlineInput">
+    <select id="taskStatusInput">
+      <option value="Pending">Pending</option>
+      <option value="Complete">Complete</option>
+    </select>
+    <div class="modal-actions">
+      <button id="saveTaskBtn">Save</button>
+      <button onclick="closeTaskModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+
+  <script src="base_Event_Detail.js"></script>
 </body>
 </html>
