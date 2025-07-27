@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Team & Participants | MindHive</title>
+  <link rel="stylesheet" href="team_participant.css" />
+</head>
+<body>
+  <!-- Navigation -->
+  <div class="top-nav">
+    <div class="logo">
+      <a href="main_Dashboard.html" class="logo-link">
+        <span class="mind">Mind</span><span class="hive">Hive</span>
+      </a>
+    </div>
+    <div class="nav-links">
+      <a href="main_Dashboard.html">Main Page</a>
+      <a href="past_Event.html">Past Events</a>
+      <a href="team_Member.html">Team Members</a>
+      <a href="help.html">Help</a>
+    </div>
+  </div>
+
+  <!-- Banner -->
+  <div class="banner">
+    <img src="res/team_member.png" alt="Team Member Banner" />
+  </div>
+
+  <!-- Main Container -->
+  <div class="team-container">
+    <h2>Team Member and Participant List</h2>
+    <div class="type-switch">
+      <button onclick="switchType('team')" class="switch-btn">Team Member</button>
+      <button onclick="switchType('participant')" class="switch-btn">Participant</button>
+    </div>
+    <button id="addBtn" class="add-btn" onclick="openAddModal()">+ Add Member</button>
+
+    <table>
+      <thead id="tableHeader"></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3 id="modalTitle">Add Member</h3>
+      <div id="teamFields">
+        <input type="text" id="teamName" placeholder="Name" required />
+        <input type="text" id="teamRole" placeholder="Role" required />
+        <input type="text" id="teamTask" placeholder="Task Involved" required />
+      </div>
+      <div id="participantFields">
+        <input type="text" id="participantName" placeholder="Name" required />
+        <input type="email" id="participantEmail" placeholder="Email" required />
+        <input type="text" id="participantPhone" placeholder="H/P No." required />
+      </div>
+      <button onclick="saveMember()">Save</button>
+    </div>
+  </div>
+
+  <script src="team_participant.js"></script>
+</body>
+</html>
