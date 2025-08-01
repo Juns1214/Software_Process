@@ -22,6 +22,6 @@ function login() {
     localStorage.setItem("userName", user.name);
     window.location.href = "main_Dashboard.html";
   } else {
-    errorEl.textContent = "Invalid email or password";
+    alert("Invalid email or password");
   }
 }
