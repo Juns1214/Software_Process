@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   window.goBack = () => {
-    window.location.href = `team_participant.html?id=${eventId}`;
+    window.location.href = `base_Event_Detail.html?id=${eventId}`;
   };
 
   // Initialize

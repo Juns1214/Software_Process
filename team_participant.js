@@ -315,8 +315,14 @@ window.onclick = function(event) {
   }
 }
 
+
 window.onload = function () {
   loadData();
   switchType("team");
   updateAttendanceButton();
 };
+
+function goBackToEvent() {
+  // Redirects to the event detail page with event ID
+  window.location.href = `base_Event_Detail.html?id=${eventId}`;
+}
