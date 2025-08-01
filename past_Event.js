@@ -86,17 +86,21 @@ const pastEvents = [
   }
 ];
 
-// Render Past Events
 const container = document.getElementById("eventCards");
 pastEvents.forEach((event) => {
   const card = document.createElement("div");
   card.className = "event-card";
+
+  // Generate dynamic classes based on values
+  const stageClass = `completed`; // assuming all are "Completed"
+  const budgetClass = event.budget.toLowerCase().replace(/\s+/g, '-'); // "Under Budget" → "under-budget"
+
   card.innerHTML = `
     <h3>${event.name}</h3>
     <p><strong>PIC:</strong> ${event.pic}</p>
     <p><strong>Date:</strong> ${event.date}</p>
-    <p><strong>Stage:</strong> ${event.stage}</p>
-    <p><strong>Budget Status:</strong> ${event.budget}</p>
+    <p><strong>Stage:</strong> <span class="tag ${stageClass}">${event.stage}</span></p>
+    <p><strong>Budget Status:</strong> <span class="tag ${budgetClass}">${event.budget}</span></p>
   `;
   container.appendChild(card);
 });

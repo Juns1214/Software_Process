@@ -297,22 +297,34 @@ body {
   color: #e74c3c;
 }
 
-/* === New Custom Tags for Past Events === */
-.tag.completed {
+.event-card .tag.completed {
   background-color: #e0f2f1;
   color: #004d40;
+  border: 1px solid #b2dfdb;
 }
-.tag.over-budget {
-  background-color: #ffebee;
-  color: #c62828;
-}
-.tag.under-budget {
+
+.event-card .tag.under-budget {
   background-color: #e8f5e9;
   color: #2e7d32;
+  border: 1px solid #c8e6c9;
 }
-.tag.on-budget {
+
+.event-card .tag.over-budget {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+.event-card .tag.on-budget {
   background-color: #fff8e1;
   color: #f9a825;
+  border: 1px solid #ffecb3;
+}
+
+.event-card .tag.slightly-over {
+  background-color: #fff3e0;
+  color: #ef6c00;
+  border: 1px solid #ffb74d;
 }
 
 
