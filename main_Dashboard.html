@@ -79,7 +79,27 @@
         <form id="eventForm">
           <input type="text" id="eventName" placeholder="Event Name" required />
           <input type="text" id="eventPIC" placeholder="Person in Charge" required />
-          <input type="date" id="eventDate" required />
+          
+          <!-- Date Type Selection -->
+          <label>Date Type:</label>
+          <select id="dateType">
+            <option value="single">Single Date</option>
+            <option value="range">Date Range</option>
+          </select>
+
+          <!-- Single Date Input -->
+          <div id="singleDateContainer">
+            <label>Event Date:</label>
+            <input type="date" id="eventDate" />
+          </div>
+
+          <!-- Date Range Inputs -->
+          <div id="dateRangeContainer" style="display: none;">
+            <label>Start Date:</label>
+            <input type="date" id="eventStartDate" />
+            <label>End Date:</label>
+            <input type="date" id="eventEndDate" />
+          </div>
 
           <label>Stage:</label>
           <select id="eventStage">

@@ -30,16 +30,28 @@
   <!-- Main Container -->
   <div class="team-container">
     <h2>Team Member and Participant List</h2>
-    <div class="type-switch">
-      <button onclick="switchType('team')" class="switch-btn">Team Member</button>
-      <button onclick="switchType('participant')" class="switch-btn">Participant</button>
+    
+    <!-- Action Buttons Row -->
+    <div class="action-buttons">
+      <div class="type-switch">
+        <button onclick="switchType('team')" class="switch-btn active" id="teamBtn">Team Member</button>
+        <button onclick="switchType('participant')" class="switch-btn" id="participantBtn">Participant</button>
+      </div>
+      <div class="control-buttons">
+        <button id="addBtn" class="add-btn" onclick="openAddModal()">+ Add Member</button>
+        <button id="attendanceBtn" class="attendance-btn" onclick="goToAttendance()" style="display: none;">📋 Create Attendance List</button>
+      </div>
     </div>
-    <button id="addBtn" class="add-btn" onclick="openAddModal()">+ Add Member</button>
 
     <table>
       <thead id="tableHeader"></thead>
       <tbody id="tableBody"></tbody>
     </table>
+
+    <!-- Show attendance button only if data exists -->
+    <div id="attendanceInfo" class="attendance-info" style="display: none;">
+      <p>Team members and participants are ready for attendance tracking!</p>
+    </div>
   </div>
 
   <!-- Modal -->

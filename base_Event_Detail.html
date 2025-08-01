@@ -42,8 +42,28 @@
       <textarea id="editDesc"></textarea>
       <label>Event P.I.C (comma separated)</label>
       <input type="text" id="editPICs" />
-      <label>Event Date</label>
-      <input type="date" id="editDate" />
+      
+      <!-- Date Type Selection -->
+      <label>Date Type</label>
+      <select id="editDateType">
+        <option value="single">Single Date</option>
+        <option value="range">Date Range</option>
+      </select>
+
+      <!-- Single Date Input -->
+      <div id="editSingleDateContainer">
+        <label>Event Date</label>
+        <input type="date" id="editDate" />
+      </div>
+
+      <!-- Date Range Inputs -->
+      <div id="editDateRangeContainer" style="display: none;">
+        <label>Start Date</label>
+        <input type="date" id="editStartDate" />
+        <label>End Date</label>
+        <input type="date" id="editEndDate" />
+      </div>
+
       <div class="modal-actions">
         <button onclick="saveEventDetails()">Save</button>
         <button onclick="closeModal()">Cancel</button>
@@ -165,8 +185,6 @@
     </div>
   </div>
 </div>
-
-
 
   <script src="base_Event_Detail.js"></script>
 </body>

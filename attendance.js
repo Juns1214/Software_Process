@@ -7,79 +7,191 @@ document.addEventListener("DOMContentLoaded", () => {
   const participantTableBody = document.getElementById("participantBody");
   const teamTable = document.getElementById("teamMemberTable");
   const participantTable = document.getElementById("participantTable");
-
-  const modal = document.getElementById("addModal");
-  const addForm = document.getElementById("addForm");
-  const teamFields = document.getElementById("teamFields");
-  const participantFields = document.getElementById("participantFields");
-  const modalTitle = document.getElementById("modalTitle");
+  const dateInput = document.getElementById("attendanceDate");
+  const selectedDateDisplay = document.getElementById("selectedDateDisplay");
+  const summaryDate = document.getElementById("summaryDate");
 
   let currentMode = "team";
-  let editingIndex = -1;
+  let currentDate = new Date().toISOString().split('T')[0]; // Today's date
 
   if (!eventId) {
     alert("Invalid Event ID");
     return;
   }
 
+  // Load team and participant data
   const teamList = JSON.parse(localStorage.getItem(`teamMembers_${eventId}`)) || [];
   const participantList = JSON.parse(localStorage.getItem(`participants_${eventId}`)) || [];
 
-  function saveTeamList() {
-    localStorage.setItem(`teamMembers_${eventId}`, JSON.stringify(teamList));
-    console.log("Team list saved:", teamList);
+  // Check if there's any data
+  if (teamList.length === 0 && participantList.length === 0) {
+    alert("No team members or participants found. Please add them first.");
+    goBack();
+    return;
   }
 
-  function saveParticipantList() {
-    localStorage.setItem(`participants_${eventId}`, JSON.stringify(participantList));
-    console.log("Participant list saved:", participantList);
+  // Initialize date
+  dateInput.value = currentDate;
+  updateDateDisplay();
+
+  // Load attendance data for current date
+  function loadAttendanceData() {
+    const attendanceKey = `attendance_${eventId}_${currentDate}`;
+    const attendanceData = JSON.parse(localStorage.getItem(attendanceKey)) || {
+      team: {},
+      participants: {}
+    };
+    return attendanceData;
   }
 
+  // Save attendance data for current date
+  function saveAttendanceData(attendanceData) {
+    const attendanceKey = `attendance_${eventId}_${currentDate}`;
+    localStorage.setItem(attendanceKey, JSON.stringify(attendanceData));
+    console.log(`Attendance saved for ${currentDate}:`, attendanceData);
+  }
+
+  // Update date display
+  function updateDateDisplay() {
+    const dateObj = new Date(currentDate);
+    const formattedDate = dateObj.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    selectedDateDisplay.textContent = `Attendance for ${formattedDate}`;
+    summaryDate.textContent = formattedDate;
+  }
+
+  // Change date handler
+  window.changeDate = () => {
+    const newDate = dateInput.value;
+    if (newDate) {
+      currentDate = newDate;
+      updateDateDisplay();
+      renderTeamTable();
+      renderParticipantTable();
+      updateSummary();
+    }
+  };
+
+  // Calculate attendance statistics
+  function calculateStats(list, attendanceData, type) {
+    const total = list.length;
+    const present = list.filter((_, index) => attendanceData[type][index] === true).length;
+    const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
+    return { total, present, percentage };
+  }
+
+  // Update summary section
+  function updateSummary() {
+    const attendanceData = loadAttendanceData();
+    
+    const teamStats = calculateStats(teamList, attendanceData, 'team');
+    const participantStats = calculateStats(participantList, attendanceData, 'participants');
+
+    // Update team summary
+    document.getElementById("teamTotalCount").textContent = teamStats.total;
+    document.getElementById("teamPresentCount").textContent = teamStats.present;
+    document.getElementById("teamPercentage").textContent = `${teamStats.percentage}%`;
+
+    // Update participant summary
+    document.getElementById("participantTotalCount").textContent = participantStats.total;
+    document.getElementById("participantPresentCount").textContent = participantStats.present;
+    document.getElementById("participantPercentage").textContent = `${participantStats.percentage}%`;
+
+    // Update stats in table headers
+    document.getElementById("teamStats").textContent = `Present: ${teamStats.present} / Total: ${teamStats.total}`;
+    document.getElementById("participantStats").textContent = `Present: ${participantStats.present} / Total: ${participantStats.total}`;
+  }
+
+  // Render team member table
   function renderTeamTable() {
     teamTableBody.innerHTML = "";
-    teamList.forEach((member, index) => {
-        const row = document.createElement("tr");
+    const attendanceData = loadAttendanceData();
 
-        row.innerHTML = `
+    if (teamList.length === 0) {
+      teamTableBody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; color: #666; padding: 20px;">
+            No team members found for this event.
+          </td>
+        </tr>`;
+      return;
+    }
+
+    teamList.forEach((member, index) => {
+      const isPresent = attendanceData.team[index] === true;
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
         <td>${index + 1}</td>
         <td>${member.name}</td>
         <td>${member.role}</td>
-        <td>${member.task}</td>
         <td>
-            <input type="checkbox" ${member.attendance ? "checked" : ""} onchange="toggleTeamAttendance(${index})">
+          <input type="checkbox" ${isPresent ? "checked" : ""} 
+                 onchange="toggleTeamAttendance(${index})" 
+                 ${currentUserRole !== "admin" ? "disabled" : ""}>
+          <span class="${isPresent ? 'present' : 'absent'}">
+            ${isPresent ? 'Present' : 'Absent'}
+          </span>
         </td>
         <td>
-            ${currentUserRole === "admin"
-            ? `<button class="action-btn edit-btn" onclick="editTeamMember(${index})">Edit</button>
-                <button class="action-btn delete-btn" onclick="deleteTeam(${index})">Delete</button>`
-            : `<span>N/A</span>`}
+          ${currentUserRole === "admin" ? `
+            <button class="action-btn mark-present-btn" onclick="markTeamAttendance(${index}, true)" 
+                    ${isPresent ? 'disabled' : ''}>Mark Present</button>
+            <button class="action-btn mark-absent-btn" onclick="markTeamAttendance(${index}, false)" 
+                    ${!isPresent ? 'disabled' : ''}>Mark Absent</button>
+          ` : `<span>View Only</span>`}
         </td>
-        `;
-        teamTableBody.appendChild(row);
+      `;
+      teamTableBody.appendChild(row);
     });
   }
 
+  // Render participant table
   function renderParticipantTable() {
     participantTableBody.innerHTML = "";
-    participantList.forEach((p, index) => {
-        const row = document.createElement("tr");
+    const attendanceData = loadAttendanceData();
 
-        row.innerHTML = `
+    if (participantList.length === 0) {
+      participantTableBody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; color: #666; padding: 20px;">
+            No participants found for this event.
+          </td>
+        </tr>`;
+      return;
+    }
+
+    participantList.forEach((participant, index) => {
+      const isPresent = attendanceData.participants[index] === true;
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
         <td>${index + 1}</td>
-        <td>${p.name}</td>
-        <td>${p.email}</td>
-        <td>${p.phone}</td>
+        <td>${participant.name}</td>
+        <td>${participant.email}</td>
+        <td>${participant.phone}</td>
         <td>
-            <input type="checkbox" ${p.attendance ? "checked" : ""} onchange="toggleParticipantAttendance(${index})">
+          <input type="checkbox" ${isPresent ? "checked" : ""} 
+                 onchange="toggleParticipantAttendance(${index})" 
+                 ${currentUserRole !== "admin" ? "disabled" : ""}>
+          <span class="${isPresent ? 'present' : 'absent'}">
+            ${isPresent ? 'Present' : 'Absent'}
+          </span>
         </td>
         <td>
-            ${currentUserRole === "admin"
-            ? `<button class="action-btn edit-btn" onclick="editParticipant(${index})">Edit</button>
-                <button class="action-btn delete-btn" onclick="deleteParticipant(${index})">Delete</button>`
-            : `<span>N/A</span>`}
+          ${currentUserRole === "admin" ? `
+            <button class="action-btn mark-present-btn" onclick="markParticipantAttendance(${index}, true)" 
+                    ${isPresent ? 'disabled' : ''}>Mark Present</button>
+            <button class="action-btn mark-absent-btn" onclick="markParticipantAttendance(${index}, false)" 
+                    ${!isPresent ? 'disabled' : ''}>Mark Absent</button>
+          ` : `<span>View Only</span>`}
         </td>
-        `;
-        participantTableBody.appendChild(row);
+      `;
+      participantTableBody.appendChild(row);
     });
   }
 
@@ -103,244 +215,62 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Modal functions
-  window.openAddModal = (type) => {
-    if (currentUserRole !== "admin") {
-      alert("Permission denied. Only admins can add members.");
-      return;
-    }
-    
-    currentMode = type;
-    editingIndex = -1;
-    clearModalFields();
-    
-    if (type === "team") {
-      modalTitle.textContent = "Add Team Member";
-      teamFields.style.display = "block";
-      participantFields.style.display = "none";
-    } else {
-      modalTitle.textContent = "Add Participant";
-      teamFields.style.display = "none";
-      participantFields.style.display = "block";
-    }
-    modal.style.display = "block";
-  };
-
-  window.closeModal = () => {
-    modal.style.display = "none";
-    clearModalFields();
-    editingIndex = -1;
-    console.log("Modal closed, editingIndex reset");
-  };
-
-  // Edit functions
-  window.editTeamMember = (index) => {
-    if (currentUserRole !== "admin") {
-      alert("Permission denied. Only admins can edit members.");
-      return;
-    }
-    
-    editingIndex = index;
-    const member = teamList[index];
-    
-    document.getElementById("teamName").value = member.name;
-    document.getElementById("teamRole").value = member.role;
-    document.getElementById("teamTask").value = member.task;
-    
-    modalTitle.textContent = "Edit Team Member";
-    teamFields.style.display = "block";
-    participantFields.style.display = "none";
-    currentMode = "team";
-    modal.style.display = "block";
-  };
-
-  window.editParticipant = (index) => {
-    if (currentUserRole !== "admin") {
-      alert("Permission denied. Only admins can edit participants.");
-      return;
-    }
-    
-    editingIndex = index;
-    const participant = participantList[index];
-    
-    document.getElementById("participantName").value = participant.name;
-    document.getElementById("participantEmail").value = participant.email;
-    document.getElementById("participantPhone").value = participant.phone;
-    
-    modalTitle.textContent = "Edit Participant";
-    teamFields.style.display = "none";
-    participantFields.style.display = "block";
-    currentMode = "participant";
-    modal.style.display = "block";
-  };
-
-  // Update functions
-  window.updateTeam = (index, field, value) => {
-    if (currentUserRole !== "admin") return;
-    teamList[index][field] = value.trim();
-    saveTeamList();
-  };
-
-  window.updateParticipant = (index, field, value) => {
-    if (currentUserRole !== "admin") return;
-    participantList[index][field] = value.trim();
-    saveParticipantList();
-  };
-
-  // Attendance toggle functions
+  // Toggle team attendance via checkbox
   window.toggleTeamAttendance = (index) => {
-    teamList[index].attendance = !teamList[index].attendance;
-    saveTeamList();
+    if (currentUserRole !== "admin") return;
+    
+    const attendanceData = loadAttendanceData();
+    attendanceData.team[index] = !attendanceData.team[index];
+    saveAttendanceData(attendanceData);
+    renderTeamTable();
+    updateSummary();
   };
 
+  // Toggle participant attendance via checkbox
   window.toggleParticipantAttendance = (index) => {
-    participantList[index].attendance = !participantList[index].attendance;
-    saveParticipantList();
-  };
-
-  // Delete functions with confirmation
-  window.deleteTeam = (index) => {
-    if (currentUserRole !== "admin") {
-      alert("Permission denied. Only admins can delete members.");
-      return;
-    }
+    if (currentUserRole !== "admin") return;
     
-    if (confirm("Are you sure you want to delete this team member?")) {
-      teamList.splice(index, 1);
-      saveTeamList();
-      renderTeamTable();
-    }
+    const attendanceData = loadAttendanceData();
+    attendanceData.participants[index] = !attendanceData.participants[index];
+    saveAttendanceData(attendanceData);
+    renderParticipantTable();
+    updateSummary();
   };
 
-  window.deleteParticipant = (index) => {
-    if (currentUserRole !== "admin") {
-      alert("Permission denied. Only admins can delete participants.");
-      return;
-    }
+  // Mark team attendance via buttons
+  window.markTeamAttendance = (index, isPresent) => {
+    if (currentUserRole !== "admin") return;
     
-    if (confirm("Are you sure you want to delete this participant?")) {
-      participantList.splice(index, 1);
-      saveParticipantList();
-      renderParticipantTable();
-    }
+    const attendanceData = loadAttendanceData();
+    attendanceData.team[index] = isPresent;
+    saveAttendanceData(attendanceData);
+    renderTeamTable();
+    updateSummary();
   };
 
-  // Clear modal fields
-  function clearModalFields() {
-    document.getElementById("teamName").value = "";
-    document.getElementById("teamRole").value = "";
-    document.getElementById("teamTask").value = "";
-    document.getElementById("participantName").value = "";
-    document.getElementById("participantEmail").value = "";
-    document.getElementById("participantPhone").value = "";
-  }
-
-  // Form submission - Fixed version
-  addForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
+  // Mark participant attendance via buttons
+  window.markParticipantAttendance = (index, isPresent) => {
+    if (currentUserRole !== "admin") return;
     
-    console.log("Form submitted, currentMode:", currentMode, "editingIndex:", editingIndex);
-
-    try {
-      if (currentMode === "team") {
-        const nameField = document.getElementById("teamName");
-        const roleField = document.getElementById("teamRole");
-        const taskField = document.getElementById("teamTask");
-        
-        if (!nameField || !roleField || !taskField) {
-          console.error("Team form fields not found");
-          alert("Form fields not found. Please refresh the page and try again.");
-          return;
-        }
-
-        const name = nameField.value.trim();
-        const role = roleField.value.trim();
-        const task = taskField.value.trim();
-
-        console.log("Team form data:", { name, role, task });
-
-        if (!name || !role || !task) {
-          alert("Please fill in all fields for team member.");
-          return;
-        }
-
-        if (editingIndex >= 0) {
-          // Edit existing member
-          teamList[editingIndex].name = name;
-          teamList[editingIndex].role = role;
-          teamList[editingIndex].task = task;
-          console.log("Updated team member at index", editingIndex);
-        } else {
-          // Add new member
-          const newMember = { name, role, task, attendance: false };
-          teamList.push(newMember);
-          console.log("Added new team member:", newMember);
-        }
-        saveTeamList();
-        renderTeamTable();
-        
-      } else if (currentMode === "participant") {
-        const nameField = document.getElementById("participantName");
-        const emailField = document.getElementById("participantEmail");
-        const phoneField = document.getElementById("participantPhone");
-        
-        if (!nameField || !emailField || !phoneField) {
-          console.error("Participant form fields not found");
-          alert("Form fields not found. Please refresh the page and try again.");
-          return;
-        }
-
-        const name = nameField.value.trim();
-        const email = emailField.value.trim();
-        const phone = phoneField.value.trim();
-
-        console.log("Participant form data:", { name, email, phone });
-
-        if (!name || !email || !phone) {
-          alert("Please fill in all fields for participant.");
-          return;
-        }
-
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          alert("Invalid email format.");
-          return;
-        }
-
-        if (editingIndex >= 0) {
-          // Edit existing participant
-          participantList[editingIndex].name = name;
-          participantList[editingIndex].email = email;
-          participantList[editingIndex].phone = phone;
-          console.log("Updated participant at index", editingIndex);
-        } else {
-          // Add new participant
-          const newParticipant = { name, email, phone, attendance: false };
-          participantList.push(newParticipant);
-          console.log("Added new participant:", newParticipant);
-        }
-        saveParticipantList();
-        renderParticipantTable();
-      }
-
-      console.log("Closing modal and resetting form");
-      closeModal();
-      
-    } catch (error) {
-      console.error("Error in form submission:", error);
-      alert("An error occurred while saving. Please try again.");
-    }
-  });
-
-  // Close modal when clicking outside
-  window.onclick = (e) => {
-    if (e.target === modal) {
-      closeModal();
-    }
+    const attendanceData = loadAttendanceData();
+    attendanceData.participants[index] = isPresent;
+    saveAttendanceData(attendanceData);
+    renderParticipantTable();
+    updateSummary();
   };
 
-  // Initialize
+  // Go back to team and participants page
+  window.goBack = () => {
+    window.location.href = `team_participant.html?id=${eventId}`;
+  };
+
+  // Initialize the page
   renderTeamTable();
   renderParticipantTable();
   switchView("team"); // Start with team view
+  updateSummary();
+
+  console.log("Attendance page initialized for event:", eventId);
+  console.log("Team members:", teamList.length);
+  console.log("Participants:", participantList.length);
 });

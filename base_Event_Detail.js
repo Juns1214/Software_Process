@@ -19,11 +19,48 @@ const budgetModal = document.getElementById("budgetModal");
 const milestoneModal = document.getElementById("milestoneModal");
 const addMilestoneBtn = document.getElementById("addMilestoneBtn");
 
+// Date type handling elements
+const editDateTypeSelect = document.getElementById("editDateType");
+const editSingleDateContainer = document.getElementById("editSingleDateContainer");
+const editDateRangeContainer = document.getElementById("editDateRangeContainer");
+
 // Hide admin-only buttons from employees
 if (role !== "admin") {
   editBtn.style.display = "none";
   budgetEditBtn.style.display = "none";
   addMilestoneBtn.style.display = "none";
+}
+
+// Date type change handler for edit modal
+if (editDateTypeSelect) {
+  editDateTypeSelect.addEventListener("change", () => {
+    const dateType = editDateTypeSelect.value;
+    if (dateType === "single") {
+      editSingleDateContainer.style.display = "block";
+      editDateRangeContainer.style.display = "none";
+      // Clear range inputs
+      document.getElementById("editStartDate").value = "";
+      document.getElementById("editEndDate").value = "";
+    } else {
+      editSingleDateContainer.style.display = "none";
+      editDateRangeContainer.style.display = "block";
+      // Clear single date input
+      document.getElementById("editDate").value = "";
+    }
+  });
+}
+
+// Helper function to format date display
+function formatEventDate(event) {
+  if (event.dateData) {
+    if (event.dateData.type === "single") {
+      return event.dateData.date;
+    } else {
+      return `${event.dateData.startDate} to ${event.dateData.endDate}`;
+    }
+  }
+  // Fallback to legacy date field
+  return event.date || "N/A";
 }
 
 // Load event details
@@ -36,11 +73,13 @@ function loadEventDetails() {
   eventTitle.textContent = event.name || "Event Name";
   eventDescription.textContent = event.description || "About event";
 
+  // Handle PIC compatibility
   if (!event.pics && event.pic) {
     event.pics = [event.pic];
   }
 
-  document.getElementById("eventDate").textContent = event.date || "N/A";
+  // Display formatted date
+  document.getElementById("eventDate").textContent = formatEventDate(event);
 
   if (!event.milestones) event.milestones = [];
   if (!event.budgetData) {
@@ -93,7 +132,29 @@ editBtn.addEventListener("click", () => {
   document.getElementById("editName").value = event.name || "";
   document.getElementById("editDesc").value = event.description || "";
   document.getElementById("editPICs").value = (event.pics || []).join(", ");
-  document.getElementById("editDate").value = event.date || "";
+  
+  // Set up date fields based on event's date structure
+  if (event.dateData) {
+    editDateTypeSelect.value = event.dateData.type;
+    
+    if (event.dateData.type === "single") {
+      editSingleDateContainer.style.display = "block";
+      editDateRangeContainer.style.display = "none";
+      document.getElementById("editDate").value = event.dateData.date || "";
+    } else {
+      editSingleDateContainer.style.display = "none";
+      editDateRangeContainer.style.display = "block";
+      document.getElementById("editStartDate").value = event.dateData.startDate || "";
+      document.getElementById("editEndDate").value = event.dateData.endDate || "";
+    }
+  } else {
+    // Legacy single date
+    editDateTypeSelect.value = "single";
+    editSingleDateContainer.style.display = "block";
+    editDateRangeContainer.style.display = "none";
+    document.getElementById("editDate").value = event.date || "";
+  }
+  
   modal.classList.remove("hidden");
 });
 
@@ -105,7 +166,40 @@ function saveEventDetails() {
   event.name = document.getElementById("editName").value;
   event.description = document.getElementById("editDesc").value;
   event.pics = document.getElementById("editPICs").value.split(",").map(s => s.trim()).filter(Boolean);
-  event.date = document.getElementById("editDate").value;
+  
+  // Handle date saving
+  const dateType = editDateTypeSelect.value;
+  
+  if (dateType === "single") {
+    const singleDate = document.getElementById("editDate").value;
+    if (!singleDate) {
+      alert("Please select a date.");
+      return;
+    }
+    event.dateData = {
+      type: "single",
+      date: singleDate
+    };
+    event.date = singleDate; // Legacy compatibility
+  } else {
+    const startDate = document.getElementById("editStartDate").value;
+    const endDate = document.getElementById("editEndDate").value;
+    if (!startDate || !endDate) {
+      alert("Please select both start and end dates.");
+      return;
+    }
+    if (new Date(startDate) > new Date(endDate)) {
+      alert("Start date cannot be after end date.");
+      return;
+    }
+    event.dateData = {
+      type: "range",
+      startDate: startDate,
+      endDate: endDate
+    };
+    event.date = `${startDate} to ${endDate}`; // Legacy compatibility
+  }
+  
   saveEvent();
   loadEventDetails();
   closeModal();

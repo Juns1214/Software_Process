@@ -27,16 +27,31 @@
   </div>
 
   <div class="team-container">
-    <h2>Team Member and Participant Attendance</h2>
+    <div class="attendance-header">
+      <h2>Team Member and Participant Attendance</h2>
+      <button id="backBtn" class="back-btn" onclick="goBack()">← Back to Team & Participants</button>
+    </div>
+
+    <!-- Date Selector -->
+    <div class="date-selector">
+      <label for="attendanceDate">Select Date:</label>
+      <input type="date" id="attendanceDate" onchange="changeDate()">
+      <span id="selectedDateDisplay" class="selected-date"></span>
+    </div>
+
+    <!-- Toggle Buttons -->
     <div class="toggle-buttons">
       <button id="teamBtn" class="switch-btn active" onclick="switchView('team')">Team Members</button>
       <button id="participantBtn" class="switch-btn" onclick="switchView('participant')">Participants</button>
     </div>
 
+    <!-- Team Member Table -->
     <div class="table-container" id="teamMemberTable">
       <div class="table-header">
-        <h3>Team Members</h3>
-        <button id="addTeamBtn" class="add-btn" onclick="openAddModal('team')">+ Add Member</button>
+        <h3>Team Members Attendance</h3>
+        <div class="attendance-stats">
+          <span id="teamStats" class="stats">Present: 0 / Total: 0</span>
+        </div>
       </div>
       <table>
         <thead>
@@ -44,7 +59,6 @@
             <th>No.</th>
             <th>Name</th>
             <th>Role</th>
-            <th>Task Involved</th>
             <th>Attendance</th>
             <th>Action</th>
           </tr>
@@ -53,10 +67,13 @@
       </table>
     </div>
 
+    <!-- Participant Table -->
     <div class="table-container" id="participantTable" style="display: none;">
       <div class="table-header">
-        <h3>Participants</h3>
-        <button id="addParticipantBtn" class="add-btn" onclick="openAddModal('participant')">+ Add Participant</button>
+        <h3>Participants Attendance</h3>
+        <div class="attendance-stats">
+          <span id="participantStats" class="stats">Present: 0 / Total: 0</span>
+        </div>
       </div>
       <table>
         <thead>
@@ -72,26 +89,26 @@
         <tbody id="participantBody"></tbody>
       </table>
     </div>
-  </div>
 
-  <!-- Modal -->
-  <div id="addModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h3 id="modalTitle">Add Team Member</h3>
-      <form id="addForm">
-        <div id="teamFields">
-          <input type="text" id="teamName" placeholder="Name" />
-          <input type="text" id="teamRole" placeholder="Role" />
-          <input type="text" id="teamTask" placeholder="Task Involved" />
+    <!-- Summary Section -->
+    <div class="attendance-summary">
+      <h3>Attendance Summary for <span id="summaryDate"></span></h3>
+      <div class="summary-cards">
+        <div class="summary-card">
+          <h4>Team Members</h4>
+          <div class="summary-numbers">
+            <span id="teamPresentCount">0</span> / <span id="teamTotalCount">0</span>
+          </div>
+          <div class="summary-percentage" id="teamPercentage">0%</div>
         </div>
-        <div id="participantFields" style="display: none;">
-          <input type="text" id="participantName" placeholder="Name" />
-          <input type="email" id="participantEmail" placeholder="Email" />
-          <input type="text" id="participantPhone" placeholder="H/P No." />
+        <div class="summary-card">
+          <h4>Participants</h4>
+          <div class="summary-numbers">
+            <span id="participantPresentCount">0</span> / <span id="participantTotalCount">0</span>
+          </div>
+          <div class="summary-percentage" id="participantPercentage">0%</div>
         </div>
-        <button type="submit" class="add-submit-btn">Save</button>
-      </form>
+      </div>
     </div>
   </div>
 
