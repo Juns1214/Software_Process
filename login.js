@@ -1,11 +1,10 @@
-// Simulated database of employees
 const employees = [
-  { email: "admin@mindhive.com", password: "admin123", role: "admin" },
-  { email: "jane@mindhive.com", password: "jane123", role: "employee" },
-  { email: "john@mindhive.com", password: "john123", role: "employee" },
+  { email: "admin@mindhive.com", password: "admin123", role: "admin", name: "Admin User" },
+  { email: "jane@mindhive.com", password: "jane123", role: "employee", name: "Jane Smith" },
+  { email: "john@mindhive.com", password: "john123", role: "employee", name: "John Doe" },
+  // Add more employees with their names
 ];
 
-// Login function
 function login() {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
@@ -16,11 +15,11 @@ function login() {
   );
 
   if (user) {
-    // Save user data to localStorage
+    // Store user data with consistent naming
     localStorage.setItem("userRole", user.role);
+    localStorage.setItem("role", user.role); // For backward compatibility
     localStorage.setItem("userEmail", user.email);
-
-    // Redirect to unified dashboard
+    localStorage.setItem("userName", user.name);
     window.location.href = "main_Dashboard.html";
   } else {
     errorEl.textContent = "Invalid email or password";

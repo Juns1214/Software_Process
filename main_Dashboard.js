@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const role = localStorage.getItem("userRole") || "employee";
+  const userEmail = localStorage.getItem("userEmail") || "";
+  const userName = localStorage.getItem("userName") || "";
   const modal = document.getElementById("eventModal");
   const addBtn = document.getElementById("addEventBtn");
   const closeBtn = document.getElementById("closeModal");
@@ -133,11 +135,12 @@ document.addEventListener("DOMContentLoaded", () => {
         id: eventId,
         name,
         pics: picArray,
-        dateData: dateData, // Store complete date information
+        dateData: dateData,
         // Keep legacy date field for backward compatibility
         date: dateType === "single" ? dateData.date : `${dateData.startDate} to ${dateData.endDate}`,
         stage,
-        budget
+        budget,
+        teamMembers: [] // Initialize empty team members array (stores names only)
       };
 
       const events = JSON.parse(localStorage.getItem("events") || "[]");
@@ -167,9 +170,71 @@ document.addEventListener("DOMContentLoaded", () => {
     return event.date || "N/A";
   }
 
+  // FIXED: Function to get team members for an event from team_participant data
+  function getEventTeamMembers(eventId) {
+    const teamData = JSON.parse(localStorage.getItem(`teamMembers_${eventId}`)) || [];
+    return teamData.map(member => member.name);
+  }
+
+  // FIXED: Function to update event's teamMembers array with current team data
+  function syncEventTeamMembers() {
+    const events = JSON.parse(localStorage.getItem("events") || "[]");
+    let updated = false;
+
+    events.forEach(event => {
+      const currentTeamMembers = getEventTeamMembers(event.id);
+      // Only update if team members have changed
+      if (JSON.stringify(event.teamMembers || []) !== JSON.stringify(currentTeamMembers)) {
+        event.teamMembers = currentTeamMembers;
+        updated = true;
+      }
+    });
+
+    if (updated) {
+      localStorage.setItem("events", JSON.stringify(events));
+    }
+  }
+
+  // Filter events based on user role and name matching
+  function getVisibleEvents() {
+    // Sync team member data first
+    syncEventTeamMembers();
+    
+    const events = JSON.parse(localStorage.getItem("events") || "[]");
+    
+    if (role === "admin") {
+      // Admin can see all events
+      return events;
+    } else {
+      // Employee can only see events where their name is in teamMembers array
+      return events.filter(event => {
+        // Initialize teamMembers array if it doesn't exist
+        if (!event.teamMembers) {
+          event.teamMembers = [];
+        }
+        
+        // Check if current user's name is in the event's team members
+        return event.teamMembers.some(memberName => 
+          memberName.toLowerCase().trim() === userName.toLowerCase().trim()
+        );
+      });
+    }
+  }
+
   function renderEvents() {
     eventList.innerHTML = "";
-    const events = JSON.parse(localStorage.getItem("events") || "[]");
+    const events = getVisibleEvents(); // Use filtered events based on name matching
+
+    // Show message if employee has no events assigned
+    if (role === "employee" && events.length === 0) {
+      eventList.innerHTML = `
+        <div style="text-align: center; padding: 40px; color: #666;">
+          <h3>No Events Assigned</h3>
+          <p>Hi ${userName}! You haven't been assigned to any events yet.<br>Contact your administrator for access.</p>
+        </div>
+      `;
+      return;
+    }
 
     events.forEach(event => {
       const stageClass = event.stage;
@@ -185,6 +250,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const dateDisplay = formatDateDisplay(event);
 
+      // Show team members count for employees
+      const teamMembersCount = event.teamMembers ? event.teamMembers.length : 0;
+
       const cardHTML = `
         <div class="event-card" data-id="${event.id}">
             ${role === "admin" ? `<i class="fas fa-trash trash-icon" title="Delete Event"></i>` : ""}
@@ -193,6 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <p><strong>Date:</strong> ${dateDisplay}</p>
             <p><strong>Stage:</strong> <span class="tag ${stageClass}">${capitalize(event.stage)}</span></p>
             <p><strong>Budget:</strong> <span class="tag ${budgetClass}">${capitalize(event.budget)}</span></p>
+            ${role === "employee" ? `<p><strong>Team Size:</strong> ${teamMembersCount} members</p>` : ""}
             <div class="event-links">
             </div>
         </div>`;
@@ -211,6 +280,11 @@ document.addEventListener("DOMContentLoaded", () => {
             let events = JSON.parse(localStorage.getItem("events") || "[]");
             events = events.filter(event => event.id !== id);
             localStorage.setItem("events", JSON.stringify(events));
+            
+            // FIXED: Clean up related data when event is deleted
+            localStorage.removeItem(`teamMembers_${id}`);
+            localStorage.removeItem(`participants_${id}`);
+            
             renderEvents();
           }
         });

@@ -11,11 +11,8 @@ if (!eventId) {
   throw new Error("Missing Event ID in URL");
 }
 
-// Set role
-if (!localStorage.getItem("role")) {
-  localStorage.setItem("role", "admin");
-}
-let isAdmin = localStorage.getItem("role") === "admin";
+// FIXED: Use consistent role storage
+let isAdmin = localStorage.getItem("userRole") === "admin";
 
 // Load existing data for this event
 function loadData() {
@@ -23,10 +20,27 @@ function loadData() {
   participantData = JSON.parse(localStorage.getItem(`participants_${eventId}`)) || [];
 }
 
+// FIXED: Save data and sync with main events
 function saveData() {
   localStorage.setItem(`teamMembers_${eventId}`, JSON.stringify(teamData));
   localStorage.setItem(`participants_${eventId}`, JSON.stringify(participantData));
+  
+  // FIXED: Update the main event's teamMembers array
+  syncWithMainEvents();
+  
   updateAttendanceButton();
+}
+
+// FIXED: Function to sync team member names with main events
+function syncWithMainEvents() {
+  const events = JSON.parse(localStorage.getItem("events") || "[]");
+  const eventIndex = events.findIndex(event => event.id == eventId);
+  
+  if (eventIndex !== -1) {
+    // Update the event's teamMembers array with current team member names
+    events[eventIndex].teamMembers = teamData.map(member => member.name);
+    localStorage.setItem("events", JSON.stringify(events));
+  }
 }
 
 function updateAttendanceButton() {

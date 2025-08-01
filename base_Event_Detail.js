@@ -5,8 +5,26 @@ const eventId = urlParams.get("id");
 let events = JSON.parse(localStorage.getItem("events") || "[]");
 let event = events.find(e => e.id == eventId);
 
-// Get user role
+// Get user role and info
 const role = localStorage.getItem("userRole") || "employee";
+const userEmail = localStorage.getItem("userEmail") || "";
+const userName = localStorage.getItem("userName") || "";
+
+// Check if employee has access to this event (based on name matching)
+if (role === "employee") {
+  if (!event || !event.teamMembers || !event.teamMembers.some(memberName => 
+    memberName.toLowerCase().trim() === userName.toLowerCase().trim())) {
+    document.body.innerHTML = `
+      <div style="text-align: center; padding: 40px;">
+        <h2>Access Denied</h2>
+        <p>Hi ${userName}! You don't have permission to view this event.</p>
+        <p>Contact your administrator if you think this is an error.</p>
+        <a href="main_Dashboard.html" style="color: #007bff; text-decoration: none;">← Back to Dashboard</a>
+      </div>
+    `;
+    throw new Error("Access denied");
+  }
+}
 
 // DOM Elements
 const eventTitle = document.getElementById("eventTitle");
@@ -78,6 +96,11 @@ function loadEventDetails() {
     event.pics = [event.pic];
   }
 
+  // Initialize teamMembers array if it doesn't exist
+  if (!event.teamMembers) {
+    event.teamMembers = [];
+  }
+
   // Display formatted date
   document.getElementById("eventDate").textContent = formatEventDate(event);
 
@@ -94,6 +117,7 @@ function loadEventDetails() {
   renderPICList();
   renderMilestones();
   renderBudgetProgress();
+  renderTeamMembers();
 }
 
 // Render PIC names
@@ -107,6 +131,75 @@ function renderPICList() {
     div.textContent = picName;
     picListEl.appendChild(div);
   });
+}
+
+// Render team members (NEW FUNCTION)
+function renderTeamMembers() {
+  const teamMembersSection = document.getElementById("teamMembersSection");
+  if (!teamMembersSection) return; // Element might not exist in HTML yet
+  
+  const membersList = document.getElementById("teamMembersList");
+  membersList.innerHTML = "";
+  
+  if (!event.teamMembers || event.teamMembers.length === 0) {
+    membersList.innerHTML = "<p>No team members assigned to this event yet.</p>";
+    return;
+  }
+  
+  event.teamMembers.forEach((memberName, index) => {
+    const memberDiv = document.createElement("div");
+    memberDiv.className = "team-member-item";
+    memberDiv.innerHTML = `
+      <span class="member-name">${memberName}</span>
+      ${role === "admin" ? `<button onclick="removeTeamMember(${index})" class="remove-btn">Remove</button>` : ""}
+    `;
+    membersList.appendChild(memberDiv);
+  });
+}
+
+// Add team member to event (NEW FUNCTION)
+function addTeamMember() {
+  const memberName = document.getElementById("teamMemberNameInput").value.trim();
+  
+  if (!memberName) {
+    alert("Please enter a team member name.");
+    return;
+  }
+  
+  // Check if member is already added (case-insensitive)
+  if (event.teamMembers.some(name => name.toLowerCase() === memberName.toLowerCase())) {
+    alert("This team member is already assigned to the event.");
+    return;
+  }
+  
+  // Add member to event
+  event.teamMembers.push(memberName);
+  
+  saveEvent();
+  renderTeamMembers();
+  closeTeamMemberModal();
+  
+  alert(`${memberName} has been added to the event team!`);
+}
+
+// Remove team member from event (NEW FUNCTION)
+function removeTeamMember(index) {
+  const memberName = event.teamMembers[index];
+  if (confirm(`Are you sure you want to remove "${memberName}" from the event team?`)) {
+    event.teamMembers.splice(index, 1);
+    saveEvent();
+    renderTeamMembers();
+  }
+}
+
+// Team member modal functions (NEW FUNCTIONS)
+function openTeamMemberModal() {
+  document.getElementById("teamMemberNameInput").value = "";
+  document.getElementById("teamMemberModal").classList.remove("hidden");
+}
+
+function closeTeamMemberModal() {
+  document.getElementById("teamMemberModal").classList.add("hidden");
 }
 
 // Render milestones
@@ -263,6 +356,19 @@ document.getElementById("closeMilestoneModal").addEventListener("click", () => {
   milestoneModal.classList.add("hidden");
 });
 
+// Team Member Modal Event Listeners (NEW)
+if (document.getElementById("addTeamMemberBtn")) {
+  document.getElementById("addTeamMemberBtn").addEventListener("click", openTeamMemberModal);
+}
+
+if (document.getElementById("saveTeamMemberBtn")) {
+  document.getElementById("saveTeamMemberBtn").addEventListener("click", addTeamMember);
+}
+
+if (document.getElementById("closeTeamMemberModal")) {
+  document.getElementById("closeTeamMemberModal").addEventListener("click", closeTeamMemberModal);
+}
+
 // Close modals when clicking outside
 window.addEventListener("click", (e) => {
   if (e.target === budgetModal) {
@@ -273,6 +379,9 @@ window.addEventListener("click", (e) => {
   }
   if (e.target === modal) {
     closeModal();
+  }
+  if (e.target === document.getElementById("teamMemberModal")) {
+    closeTeamMemberModal();
   }
 });
 
@@ -309,6 +418,9 @@ window.addEventListener("DOMContentLoaded", () => {
   if (budgetModal) budgetModal.classList.add("hidden");
   if (milestoneModal) milestoneModal.classList.add("hidden");
   if (modal) modal.classList.add("hidden");
+  if (document.getElementById("teamMemberModal")) {
+    document.getElementById("teamMemberModal").classList.add("hidden");
+  }
   
   loadEventDetails();
 });
